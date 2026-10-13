@@ -28,7 +28,24 @@ int main()
 	int count_nastoyki[1]{ 0 };
 
 	bool has_frukt_juice = false; // чек на сок, при покупке боярышника
+	bool payment_success = false;
 	int choice, item, n;
+
+	
+	// кол-во товаров на складе
+
+	int stock_frukty[4]{ 15, 20 ,35 ,40 };
+	int stock_ovoshi[3]{ 10, 5, 7 };
+	int stock_tea[2]{ 3, 4 };
+	int stock_nastoyki[1]{ 3 };
+
+
+	/*
+	TODO:
+	 выбрать 1 товар , либо целую категорию, либо все и когда стартует программа, 
+	есть склад и там кол-во товаров, пользователь может покупать товар пока они там есть, 
+	если он оплатил , то эти товары со склада удаляются
+	*/
 
 	while (true) {
 
@@ -47,7 +64,7 @@ int main()
 				system("cls");
 				cout << "--- Фруктовые Соки --- \n";
 				for (int i = 0; i < 4; i++)
-					cout << i + 1 << ". " << name_frukty[i] << " - " << price_frukty[i] << " руб./банка (в корзине: " << count_frukty[i] << ")\n";
+					cout << i + 1 << ". " << name_frukty[i] << " - " << price_frukty[i] << " руб./банка (в корзине: " << count_frukty[i] << ", Доступно на складе: " << stock_frukty[i] << ")\n";
 				cout << "0. Вернуться к категориям \n";
 				cout << "Выберите товар: ";
 				cin >> item;
@@ -62,13 +79,30 @@ int main()
 					continue;
 				}
 
+				int it = item - 1;
+
+				// товара нету
+				if (stock_frukty[it] <= 0) {
+					cout << "\nИзвините, этот товар закончился на складе!\n";
+					Sleep(2000);
+					continue;
+				}
+
 				cout << "Сколько литровых банок: ";
 				cin >> n;
 				if (n < 0) {
 					cout << "Неверное колличество!";
 					continue;
 				}
-				count_frukty[item - 1] += n;
+
+				if (count_frukty[it] + n > stock_frukty[it]) {
+					cout << "\nНедостаточно товара на складе!\n";
+					Sleep(3000);
+					continue;
+				}
+
+				/*count_frukty[item - 1] += n;*/
+				count_frukty[it] += n;
 
 				if (n > 0 && count_nastoyki[0] > 0) { // аннулирование боярышника в корзине, так как есть фрукт сок
 					count_nastoyki[0] = 0; 
@@ -250,6 +284,8 @@ int main()
 		return 0;
 	}
 
+
+	
 	
 	// Проверки на скидки и тд
 
@@ -276,27 +312,19 @@ int main()
 	cout << "1. Оплатить картой \n" << "2. Оплатить наличными \n";
 	cout << "Ваш выбор: ";
 	cin >> choice_payment;
+
 	
-	if (choice_payment == 1) {
-		while (true) {
-			system("cls");
-			//cout << "Введите пин-код вашей карты: \n";
-			//cin >> pin_code;
-			//system("cls");
-			cout << "Сумма вашей покупки была: " << sum << "\n";
-			cout << "Спасибо за покупку. Приходите к нам еще! \n";
-			break;
-		}
-
-
+	if (choice_payment == 1 || choice_payment == 2) {
+		payment_success = true;
+		system("cls");
+		cout << "Сумма вашей покупки была: " << sum << "\n";
+		cout << "Спасибо за покупку. Приходите к нам еще! \n";
 	}
 
-	else if (choice_payment == 2) {
-		while (true) {
-			system("cls");
-			cout << "Сумма вашей покупки была: " << sum << "\n";
-			cout << "Спасибо за покупку. Приходите к нам еще!\n";
-			break;
+	
+	if (payment_success) {
+		for (int i = 0; i < 4; i++) {
+			stock_frukty[i] -= count_frukty[i]; // вычит товар на складе
 		}
 	}
 
